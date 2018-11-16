@@ -1,13 +1,30 @@
 class Resultados extends React.Component {
   render() {
-    return React.createElement("ul", {
+    return React.createElement("div", null, React.createElement("ul", {
       className: "resultados-lista"
     }, this.props.resultados.map(function (resultado) {
       return React.createElement(Itemresultado, {
         key: resultado.id,
         resultado: resultado
       });
-    }.bind(this)));
+    }.bind(this))), React.createElement("ul", {
+      className: "resultados-lista"
+    }, this.props.mediciones.map(function (medicion) {
+      return React.createElement(Itemmedicion, {
+        key: medicion.id,
+        medicion: medicion
+      });
+    }.bind(this))));
+  }
+
+}
+
+class Itemmedicion extends React.Component {
+  render() {
+    var medicion = this.props.medicion;
+    return React.createElement("li", {
+      className: "resultado"
+    }, React.createElement("h3", null, moment(medicion.fecha).format('d MMM YYYY')), React.createElement("h3", null, medicion.valores.temperatura), React.createElement("h3", null, medicion.valores.humedad));
   }
 
 }
@@ -103,6 +120,7 @@ class App extends React.Component {
     super();
     this.state = {
       resultados: resultados,
+      mediciones: mediciones,
       usuario: "gaearon",
       incluirMiembro: false
     };
@@ -149,13 +167,29 @@ class App extends React.Component {
       incluirMiembro: this.state.incluirMiembro,
       onBuscar: this.cambiarCriterioBusqueda.bind(this)
     }), React.createElement(Resultados, {
-      resultados: this.state.resultados
+      resultados: this.state.resultados,
+      mediciones: this.state.mediciones
     }));
   }
 
 }
 
 var resultados = [];
+var mediciones = [{
+  "id": 1,
+  "fecha": "2018-02-15",
+  "valores": {
+    "temperatura": 30,
+    "humedad": 88
+  }
+}, {
+  "id": 2,
+  "fecha": "2018-01-06",
+  "valores": {
+    "temperatura": 20,
+    "humedad": 50
+  }
+}];
 var resultados2 = [{
   "id": 46996317,
   "node_id": "MDEwOlJlcG9zaXRvcnk0Njk5NjMxNw==",

@@ -1,11 +1,31 @@
 class Resultados extends React.Component {
     render() {
-        return <ul className="resultados-lista">
+        return <div>
+
+        <ul className="resultados-lista">
             {this.props.resultados.map(function (resultado) {
                 return <Itemresultado key={resultado.id} resultado={resultado}></Itemresultado>;
             }.bind(this))}
-        </ul>;
+        </ul>
+            <ul className="resultados-lista">
+                {this.props.mediciones.map(function (medicion) {
+                    return <Itemmedicion key={medicion.id} medicion={medicion}></Itemmedicion>;
+                }.bind(this))}
+            </ul>
+        </div>;
     }
+}
+
+class Itemmedicion extends React.Component {
+    render() {
+        var medicion = this.props.medicion;
+        return <li className="resultado">
+            <h3>{moment(medicion.fecha).format('d MMM YYYY')}</h3>
+            <h3>{medicion.valores.temperatura}</h3>
+            <h3>{medicion.valores.humedad}</h3>
+        </li>
+    }
+
 }
 
 
@@ -94,6 +114,7 @@ class App extends React.Component {
         super();
         this.state = {
             resultados: resultados,
+            mediciones: mediciones,
             usuario: "gaearon",
             incluirMiembro: false
         };
@@ -134,7 +155,7 @@ class App extends React.Component {
                 incluirMiembro={this.state.incluirMiembro}
                 onBuscar={this.cambiarCriterioBusqueda.bind(this)}/>
 
-            <Resultados resultados={this.state.resultados}/>
+            <Resultados resultados={this.state.resultados} mediciones={this.state.mediciones}/>
         </div>
 
     }
@@ -142,6 +163,7 @@ class App extends React.Component {
 }
 
 var resultados = [];
+var mediciones = [{"id":1,"fecha":"2018-02-15", "valores":{"temperatura":30, "humedad":88}},{"id":2,"fecha":"2018-01-06", "valores":{"temperatura":20, "humedad":50}}];
 
 var resultados2 =[        {
             "id": 46996317,
