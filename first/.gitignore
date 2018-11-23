@@ -1,0 +1,43 @@
+# Ignore intellij project files and directories
+*.pid
+template.iml
+*.iml
+*.ipr
+*.iws
+*.ids
+.idea/
+*.log
+# Ignore compiler output
+target/
+out/
+classes/
+
+# Ignore log files
+logs/
+
+# Ignore performance-tests output
+performance-tests/target
+
+docs/src/main/webapp/src/docs
+docs/src/main/webapp/src/docs/*.json
+
+# Ignore build files
+build/
+build_tmp/
+.temp
+imposter.json
+
+# Ignore caches.
+caches/
+
+# Ignore daemon dir.
+daemon/
+
+.gradle/
+gradle-common/
+
+# Ignore TCServer Instances
+tcserver/
+
+# Rundeck
+rundeck_tmp/

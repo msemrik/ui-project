@@ -1,29 +1,168 @@
+// require('./app.js');
+var Alert = require('react-bootstrap').Alert;
+var Button = require('react-bootstrap').Button;
+var ListGroup = require('react-bootstrap').ListGroup;
+var ListGroupItem = require('react-bootstrap').ListGroupItem;
+var Modal = require('react-bootstrap').Modal;
+var VictoryBar = require('victory').VictoryBar;
+var VictoryChart = require('victory').VictoryChart;
+
+// alert('index works');
+
+const data = [
+    {quarter: 1, earnings: 13000},
+    {quarter: 2, earnings: 16500},
+    {quarter: 3, earnings: 14250},
+    {quarter: 4, earnings: 19000},
+    {quarter: 5, earnings: 19000},
+    {quarter: 6, earnings: 19000}
+];
+
+
+class AlertDismissable extends React.Component {
+    constructor(props, context) {
+        super(props, context);
+
+        this.handleDismiss = this.handleDismiss.bind(this);
+        this.handleShow = this.handleShow.bind(this);
+
+        this.state = {
+            show: true
+        };
+    }
+
+    handleDismiss() {
+        this.setState({show: false});
+    }
+
+    handleShow() {
+        this.setState({show: true});
+    }
+
+    render() {
+        if (this.state.show) {
+            return (
+                <Alert bsStyle="danger" onDismiss={this.handleDismiss}>
+                    <h4>Oh snap! You got an error!</h4>
+                    <p>
+                        Change this and that and try again. Duis mollis, est non commodo
+                        luctus, nisi erat porttitor ligula, eget lacinia odio sem nec elit.
+                        Cras mattis consectetur purus sit amet fermentum.
+                    </p>
+                    <p>
+                        <Button bsStyle="danger">Take this action</Button>
+                        <span> or </span>
+                        <Button onClick={this.handleDismiss}>Hide Alert</Button>
+                    </p>
+                </Alert>
+            );
+        }
+
+        return <Button onClick={this.handleShow}>Show Alert</Button>;
+    }
+}
+
+
 class Resultados extends React.Component {
     render() {
         return <div>
-
-        <ul className="resultados-lista">
-            {this.props.resultados.map(function (resultado) {
-                return <Itemresultado key={resultado.id} resultado={resultado}></Itemresultado>;
-            }.bind(this))}
-        </ul>
-            <ul className="resultados-lista">
+            {/*<AlertDismissable bsStyle="warning">*/}
+            {/*<strong>Holy guacamole!</strong> Best check yo self, you're not looking too*/}
+            {/*good.*/}
+            {/*</AlertDismissable>*/}
+            {/*<ul className="resultados-lista">*/}
+            {/*{this.props.resultados.map(function (resultado) {*/}
+            {/*return <Itemresultado key={resultado.id} resultado={resultado}></Itemresultado>;*/}
+            {/*}.bind(this))}*/}
+            {/*</ul>*/}
+            <ListGroup>
                 {this.props.mediciones.map(function (medicion) {
-                    return <Itemmedicion key={medicion.id} medicion={medicion}></Itemmedicion>;
+                    return <Itemmedicion key={medicion.id} id={medicion.id} medicion={medicion}></Itemmedicion>;
                 }.bind(this))}
-            </ul>
+            </ListGroup>
         </div>;
     }
 }
 
+
+
+
+class OwnModal extends React.Component {
+    constructor(props, context) {
+        super(props, context);
+
+        this.handleShow = this.handleShow.bind(this);
+        this.handleClose = this.handleClose.bind(this);
+
+        this.state = {
+            show: props.showProperty
+        };
+    }
+
+    componentWillReceiveProps(newProps) {
+        this.setState({show: newProps.showProperty})
+    }
+
+
+    handleClose() {
+        this.setState({show: false});
+    }
+
+    handleShow() {
+        this.setState({show: true});
+    }
+
+    handleClick(e) {
+        e.stopPropagation();
+        e.preventDefault();
+        alert('aa');
+    };
+
+    render() {
+        return <Modal show={this.state.show} onHide={this.handleClose} onClick={this.handleClick} backdrop={true}>
+            <Modal.Header closeButton>
+                <Modal.Title>Medición</Modal.Title>
+            </Modal.Header>
+            <Modal.Body>
+                <h4>{moment(this.props.medicion.fecha).format('d MMM YYYY')}</h4>
+                <p>
+                    {this.props.medicion.valores.temperatura}°
+                    {this.props.medicion.valores.humedad}%
+                </p>
+            </Modal.Body>
+            <Modal.Footer>
+                <Button onClick={this.handleClose}>Close</Button>
+            </Modal.Footer>
+        </Modal>
+    }
+}
+
+
 class Itemmedicion extends React.Component {
+
+    constructor(props, context) {
+        super(props, context);
+        this.state = {
+            open: false
+        };
+    }
+
+    handleClick(e) {
+        e.preventDefault();
+        this.setState({open: true});
+    };
+
     render() {
         var medicion = this.props.medicion;
-        return <li className="resultado">
-            <h3>{moment(medicion.fecha).format('d MMM YYYY')}</h3>
-            <h3>{medicion.valores.temperatura}</h3>
-            <h3>{medicion.valores.humedad}</h3>
-        </li>
+        return <div>
+            <ListGroupItem href="#" onClick={this.handleClick.bind(this)}>
+                {moment(medicion.fecha).format('d MMM YYYY')}
+                {medicion.valores.temperatura}°
+                {medicion.valores.humedad}%
+
+            </ListGroupItem>
+            <OwnModal medicion={medicion} showProperty={this.state.open}></OwnModal>
+        </div>
     }
 
 }
@@ -96,7 +235,7 @@ class FormularioBusqueda extends React.Component {
                    type="text"
                    onChange={this.handleUsuario.bind(this)}
                    value={this.state.usuario}/>
-            <button className="formulario-submit" type="submit" >Buscar</button>
+            <button className="formulario-submit" type="submit">Buscar</button>
             <label className="check-miembro">
                 <input type="checkbox"
                        onChange={this.handleIncluirMiembro.bind(this)}
@@ -120,15 +259,15 @@ class App extends React.Component {
         };
     }
 
-    componentDidMount(){
+    componentDidMount() {
         this.buscarResultados(this.state);
     }
 
     buscarResultados(params) {
         var url = 'https://api.github.com/users/' + params.usuario + '/repos?sort=updated&access_token=efd2602901c94d96c0955b6098f576167e9f021a';
         console.log(params.incluirMiembro);
-        if(params.incluirMiembro){
-            url+='&type=all';
+        if (params.incluirMiembro) {
+            url += '&type=all';
         }
         console.log(url);
 
@@ -149,115 +288,141 @@ class App extends React.Component {
     }
 
     render() {
-        return <div className="app">
-            <FormularioBusqueda 
+        return <div  className="app">
+            <FormularioBusqueda
                 usuario={this.state.usuario}
                 incluirMiembro={this.state.incluirMiembro}
                 onBuscar={this.cambiarCriterioBusqueda.bind(this)}/>
 
             <Resultados resultados={this.state.resultados} mediciones={this.state.mediciones}/>
+            <div className={"chartCSS"}>
+            <VictoryChart >
+                <VictoryBar
+                    // theme={VictoryTheme.material}
+                    // className="chartCSS"
+                    // style={divStyle}
+                            data={data}
+                            x={"quarter"}
+                            y={"earnings"}
+                />
+            </VictoryChart>
+            </div>
         </div>
+
+
 
     }
 
+
 }
 
-var resultados = [];
-var mediciones = [{"id":1,"fecha":"2018-02-15", "valores":{"temperatura":30, "humedad":88}},{"id":2,"fecha":"2018-01-06", "valores":{"temperatura":20, "humedad":50}}];
+var divStyle = {
+    'background-color': 'white',
+    WebkitTransition: 'all', // note the capital 'W' here
+    msTransition: 'all' // 'ms' is the only lowercase vendor prefix
+};
 
-var resultados2 =[        {
-            "id": 46996317,
-            "node_id": "MDEwOlJlcG9zaXRvcnk0Njk5NjMxNw==",
-            "name": "CuantoEnQue",
-            "full_name": "msemrik/CuantoEnQue",
-            "private": false,
-            "owner": {
-                "login": "msemrik",
-                "id": 16051243,
-                "node_id": "MDQ6VXNlcjE2MDUxMjQz",
-                "avatar_url": "https://avatars2.githubusercontent.com/u/16051243?v=4",
-                "gravatar_id": "",
-                "url": "https://api.github.com/users/msemrik",
-                "html_url": "https://github.com/msemrik",
-                "followers_url": "https://api.github.com/users/msemrik/followers",
-                "following_url": "https://api.github.com/users/msemrik/following{/other_user}",
-                "gists_url": "https://api.github.com/users/msemrik/gists{/gist_id}",
-                "starred_url": "https://api.github.com/users/msemrik/starred{/owner}{/repo}",
-                "subscriptions_url": "https://api.github.com/users/msemrik/subscriptions",
-                "organizations_url": "https://api.github.com/users/msemrik/orgs",
-                "repos_url": "https://api.github.com/users/msemrik/repos",
-                "events_url": "https://api.github.com/users/msemrik/events{/privacy}",
-                "received_events_url": "https://api.github.com/users/msemrik/received_events",
-                "type": "User",
-                "site_admin": false
-            },
-            "html_url": "https://github.com/msemrik/CuantoEnQue",
-            "description": null,
-            "fork": false,
-            "url": "https://api.github.com/repos/msemrik/CuantoEnQue",
-            "forks_url": "https://api.github.com/repos/msemrik/CuantoEnQue/forks",
-            "keys_url": "https://api.github.com/repos/msemrik/CuantoEnQue/keys{/key_id}",
-            "collaborators_url": "https://api.github.com/repos/msemrik/CuantoEnQue/collaborators{/collaborator}",
-            "teams_url": "https://api.github.com/repos/msemrik/CuantoEnQue/teams",
-            "hooks_url": "https://api.github.com/repos/msemrik/CuantoEnQue/hooks",
-            "issue_events_url": "https://api.github.com/repos/msemrik/CuantoEnQue/issues/events{/number}",
-            "events_url": "https://api.github.com/repos/msemrik/CuantoEnQue/events",
-            "assignees_url": "https://api.github.com/repos/msemrik/CuantoEnQue/assignees{/user}",
-            "branches_url": "https://api.github.com/repos/msemrik/CuantoEnQue/branches{/branch}",
-            "tags_url": "https://api.github.com/repos/msemrik/CuantoEnQue/tags",
-            "blobs_url": "https://api.github.com/repos/msemrik/CuantoEnQue/git/blobs{/sha}",
-            "git_tags_url": "https://api.github.com/repos/msemrik/CuantoEnQue/git/tags{/sha}",
-            "git_refs_url": "https://api.github.com/repos/msemrik/CuantoEnQue/git/refs{/sha}",
-            "trees_url": "https://api.github.com/repos/msemrik/CuantoEnQue/git/trees{/sha}",
-            "statuses_url": "https://api.github.com/repos/msemrik/CuantoEnQue/statuses/{sha}",
-            "languages_url": "https://api.github.com/repos/msemrik/CuantoEnQue/languages",
-            "stargazers_url": "https://api.github.com/repos/msemrik/CuantoEnQue/stargazers",
-            "contributors_url": "https://api.github.com/repos/msemrik/CuantoEnQue/contributors",
-            "subscribers_url": "https://api.github.com/repos/msemrik/CuantoEnQue/subscribers",
-            "subscription_url": "https://api.github.com/repos/msemrik/CuantoEnQue/subscription",
-            "commits_url": "https://api.github.com/repos/msemrik/CuantoEnQue/commits{/sha}",
-            "git_commits_url": "https://api.github.com/repos/msemrik/CuantoEnQue/git/commits{/sha}",
-            "comments_url": "https://api.github.com/repos/msemrik/CuantoEnQue/comments{/number}",
-            "issue_comment_url": "https://api.github.com/repos/msemrik/CuantoEnQue/issues/comments{/number}",
-            "contents_url": "https://api.github.com/repos/msemrik/CuantoEnQue/contents/{+path}",
-            "compare_url": "https://api.github.com/repos/msemrik/CuantoEnQue/compare/{base}...{head}",
-            "merges_url": "https://api.github.com/repos/msemrik/CuantoEnQue/merges",
-            "archive_url": "https://api.github.com/repos/msemrik/CuantoEnQue/{archive_format}{/ref}",
-            "downloads_url": "https://api.github.com/repos/msemrik/CuantoEnQue/downloads",
-            "issues_url": "https://api.github.com/repos/msemrik/CuantoEnQue/issues{/number}",
-            "pulls_url": "https://api.github.com/repos/msemrik/CuantoEnQue/pulls{/number}",
-            "milestones_url": "https://api.github.com/repos/msemrik/CuantoEnQue/milestones{/number}",
-            "notifications_url": "https://api.github.com/repos/msemrik/CuantoEnQue/notifications{?since,all,participating}",
-            "labels_url": "https://api.github.com/repos/msemrik/CuantoEnQue/labels{/name}",
-            "releases_url": "https://api.github.com/repos/msemrik/CuantoEnQue/releases{/id}",
-            "deployments_url": "https://api.github.com/repos/msemrik/CuantoEnQue/deployments",
-            "created_at": "2015-11-27T19:28:10Z",
-            "updated_at": "2015-12-05T20:28:26Z",
-            "pushed_at": "2015-12-05T21:00:58Z",
-            "git_url": "git://github.com/msemrik/CuantoEnQue.git",
-            "ssh_url": "git@github.com:msemrik/CuantoEnQue.git",
-            "clone_url": "https://github.com/msemrik/CuantoEnQue.git",
-            "svn_url": "https://github.com/msemrik/CuantoEnQue",
-            "homepage": null,
-            "size": 4375,
-            "stargazers_count": 0,
-            "watchers_count": 0,
-            "language": "JavaScript",
-            "has_issues": true,
-            "has_projects": true,
-            "has_downloads": true,
-            "has_wiki": true,
-            "has_pages": false,
-            "forks_count": 0,
-            "mirror_url": null,
-            "archived": false,
-            "open_issues_count": 0,
-            "license": null,
-            "forks": 0,
-            "open_issues": 0,
-            "watchers": 0,
-            "default_branch": "master"
+
+var resultados = [];
+var mediciones = [{"id": 1, "fecha": "2018-02-15", "valores": {"temperatura": 30, "humedad": 88}}, {
+    "id": 2,
+    "fecha": "2018-01-06",
+    "valores": {"temperatura": 20, "humedad": 50}
+}];
+
+var resultados2 = [{
+        "id": 46996317,
+        "node_id": "MDEwOlJlcG9zaXRvcnk0Njk5NjMxNw==",
+        "name": "CuantoEnQue",
+        "full_name": "msemrik/CuantoEnQue",
+        "private": false,
+        "owner": {
+            "login": "msemrik",
+            "id": 16051243,
+            "node_id": "MDQ6VXNlcjE2MDUxMjQz",
+            "avatar_url": "https://avatars2.githubusercontent.com/u/16051243?v=4",
+            "gravatar_id": "",
+            "url": "https://api.github.com/users/msemrik",
+            "html_url": "https://github.com/msemrik",
+            "followers_url": "https://api.github.com/users/msemrik/followers",
+            "following_url": "https://api.github.com/users/msemrik/following{/other_user}",
+            "gists_url": "https://api.github.com/users/msemrik/gists{/gist_id}",
+            "starred_url": "https://api.github.com/users/msemrik/starred{/owner}{/repo}",
+            "subscriptions_url": "https://api.github.com/users/msemrik/subscriptions",
+            "organizations_url": "https://api.github.com/users/msemrik/orgs",
+            "repos_url": "https://api.github.com/users/msemrik/repos",
+            "events_url": "https://api.github.com/users/msemrik/events{/privacy}",
+            "received_events_url": "https://api.github.com/users/msemrik/received_events",
+            "type": "User",
+            "site_admin": false
         },
+        "html_url": "https://github.com/msemrik/CuantoEnQue",
+        "description": null,
+        "fork": false,
+        "url": "https://api.github.com/repos/msemrik/CuantoEnQue",
+        "forks_url": "https://api.github.com/repos/msemrik/CuantoEnQue/forks",
+        "keys_url": "https://api.github.com/repos/msemrik/CuantoEnQue/keys{/key_id}",
+        "collaborators_url": "https://api.github.com/repos/msemrik/CuantoEnQue/collaborators{/collaborator}",
+        "teams_url": "https://api.github.com/repos/msemrik/CuantoEnQue/teams",
+        "hooks_url": "https://api.github.com/repos/msemrik/CuantoEnQue/hooks",
+        "issue_events_url": "https://api.github.com/repos/msemrik/CuantoEnQue/issues/events{/number}",
+        "events_url": "https://api.github.com/repos/msemrik/CuantoEnQue/events",
+        "assignees_url": "https://api.github.com/repos/msemrik/CuantoEnQue/assignees{/user}",
+        "branches_url": "https://api.github.com/repos/msemrik/CuantoEnQue/branches{/branch}",
+        "tags_url": "https://api.github.com/repos/msemrik/CuantoEnQue/tags",
+        "blobs_url": "https://api.github.com/repos/msemrik/CuantoEnQue/git/blobs{/sha}",
+        "git_tags_url": "https://api.github.com/repos/msemrik/CuantoEnQue/git/tags{/sha}",
+        "git_refs_url": "https://api.github.com/repos/msemrik/CuantoEnQue/git/refs{/sha}",
+        "trees_url": "https://api.github.com/repos/msemrik/CuantoEnQue/git/trees{/sha}",
+        "statuses_url": "https://api.github.com/repos/msemrik/CuantoEnQue/statuses/{sha}",
+        "languages_url": "https://api.github.com/repos/msemrik/CuantoEnQue/languages",
+        "stargazers_url": "https://api.github.com/repos/msemrik/CuantoEnQue/stargazers",
+        "contributors_url": "https://api.github.com/repos/msemrik/CuantoEnQue/contributors",
+        "subscribers_url": "https://api.github.com/repos/msemrik/CuantoEnQue/subscribers",
+        "subscription_url": "https://api.github.com/repos/msemrik/CuantoEnQue/subscription",
+        "commits_url": "https://api.github.com/repos/msemrik/CuantoEnQue/commits{/sha}",
+        "git_commits_url": "https://api.github.com/repos/msemrik/CuantoEnQue/git/commits{/sha}",
+        "comments_url": "https://api.github.com/repos/msemrik/CuantoEnQue/comments{/number}",
+        "issue_comment_url": "https://api.github.com/repos/msemrik/CuantoEnQue/issues/comments{/number}",
+        "contents_url": "https://api.github.com/repos/msemrik/CuantoEnQue/contents/{+path}",
+        "compare_url": "https://api.github.com/repos/msemrik/CuantoEnQue/compare/{base}...{head}",
+        "merges_url": "https://api.github.com/repos/msemrik/CuantoEnQue/merges",
+        "archive_url": "https://api.github.com/repos/msemrik/CuantoEnQue/{archive_format}{/ref}",
+        "downloads_url": "https://api.github.com/repos/msemrik/CuantoEnQue/downloads",
+        "issues_url": "https://api.github.com/repos/msemrik/CuantoEnQue/issues{/number}",
+        "pulls_url": "https://api.github.com/repos/msemrik/CuantoEnQue/pulls{/number}",
+        "milestones_url": "https://api.github.com/repos/msemrik/CuantoEnQue/milestones{/number}",
+        "notifications_url": "https://api.github.com/repos/msemrik/CuantoEnQue/notifications{?since,all,participating}",
+        "labels_url": "https://api.github.com/repos/msemrik/CuantoEnQue/labels{/name}",
+        "releases_url": "https://api.github.com/repos/msemrik/CuantoEnQue/releases{/id}",
+        "deployments_url": "https://api.github.com/repos/msemrik/CuantoEnQue/deployments",
+        "created_at": "2015-11-27T19:28:10Z",
+        "updated_at": "2015-12-05T20:28:26Z",
+        "pushed_at": "2015-12-05T21:00:58Z",
+        "git_url": "git://github.com/msemrik/CuantoEnQue.git",
+        "ssh_url": "git@github.com:msemrik/CuantoEnQue.git",
+        "clone_url": "https://github.com/msemrik/CuantoEnQue.git",
+        "svn_url": "https://github.com/msemrik/CuantoEnQue",
+        "homepage": null,
+        "size": 4375,
+        "stargazers_count": 0,
+        "watchers_count": 0,
+        "language": "JavaScript",
+        "has_issues": true,
+        "has_projects": true,
+        "has_downloads": true,
+        "has_wiki": true,
+        "has_pages": false,
+        "forks_count": 0,
+        "mirror_url": null,
+        "archived": false,
+        "open_issues_count": 0,
+        "license": null,
+        "forks": 0,
+        "open_issues": 0,
+        "watchers": 0,
+        "default_branch": "master"
+    },
         {
             "id": 61420126,
             "node_id": "MDEwOlJlcG9zaXRvcnk2MTQyMDEyNg==",
