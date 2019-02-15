@@ -1,4 +1,4 @@
-// require('./app.js');
+// require('./AppPosta.jsx');
 var Alert = require('react-bootstrap').Alert;
 var Button = require('react-bootstrap').Button;
 var ListGroup = require('react-bootstrap').ListGroup;
