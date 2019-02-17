@@ -6,7 +6,8 @@ var ListGroupItem = require('react-bootstrap').ListGroupItem;
 var Modal = require('react-bootstrap').Modal;
 var VictoryBar = require('victory').VictoryBar;
 var VictoryChart = require('victory').VictoryChart;
-
+var React = require('react');
+var ReactDOM = require('react-dom');
 // alert('index works');
 
 const data = [

@@ -6,8 +6,13 @@ var upload = multer();
 var session = require('express-session');
 var cookieParser = require('cookie-parser');
 
-app.set('view engine', 'jade');
-app.set('views','./views');
+// app.set('view engine', 'jade');
+// app.set('views','./views');
+
+app.engine('html', require('ejs').renderFile);
+app.set('view engine', 'html');
+app.use(express.static('public'));
+
 
 app.use(bodyParser.json());
 app.use(bodyParser.urlencoded({ extended: true })); 
@@ -16,6 +21,11 @@ app.use(cookieParser());
 app.use(session({secret: "Your secret key"}));
 
 var Users = [];
+
+
+app.get('/other', function(req, res){
+   res.render('build/index');
+});
 
 app.get('/signup', function(req, res){
    res.render('signup');

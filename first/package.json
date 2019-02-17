@@ -28,6 +28,7 @@
     "react": "^16.6.3",
     "react-bootstrap": "^0.32.4",
     "react-dom": "^16.6.3",
+    "spotify-web-api-node": "^4.0.0",
     "victory": "^31.0.1"
   },
   "devDependencies": {
